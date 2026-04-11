@@ -43,33 +43,32 @@ export function ProductListPage() {
         </div>
       )}
 
-      {!isLoading && !isError && data && (
-        <>
-          {data.data.length === 0 ? (
-            <EmptyState message="No products available" />
-          ) : (
-            <>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-                  gap: "1rem",
-                }}
-              >
-                {data.data.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+      {!isLoading &&
+        !isError &&
+        data &&
+        (data.data.length === 0 ? (
+          <EmptyState message="No products available" />
+        ) : (
+          <>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                gap: "1rem",
+              }}
+            >
+              {data.data.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </>
-          )}
-        </>
-      )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
+        ))}
     </main>
   );
 }

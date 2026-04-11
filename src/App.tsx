@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { NotFound } from "./components/NotFound";
 import { ProductDetailPage } from "./features/catalogue/components/ProductDetailPage";
 import { ProductListPage } from "./features/catalogue/components/ProductListPage";
-import { NotFound } from "./components/NotFound";
 
 export default function App() {
   return (

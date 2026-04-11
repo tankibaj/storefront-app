@@ -2,11 +2,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-import React from "react";
+import type React from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { server } from "../../src/mocks/server";
 import { ProductDetailPage } from "../../src/features/catalogue/components/ProductDetailPage";
 import { ProductListPage } from "../../src/features/catalogue/components/ProductListPage";
+import { server } from "../../src/mocks/server";
 
 // ─── Test helpers ────────────────────────────────────────────────────────────
 

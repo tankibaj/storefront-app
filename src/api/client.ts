@@ -51,8 +51,7 @@ export function listProducts(params: ListProductsParams = {}): Promise<ProductPa
   const query = new URLSearchParams();
   if (params.page !== undefined) query.set("page", String(params.page));
   if (params.per_page !== undefined) query.set("per_page", String(params.per_page));
-  if (params.in_stock_only !== undefined)
-    query.set("in_stock_only", String(params.in_stock_only));
+  if (params.in_stock_only !== undefined) query.set("in_stock_only", String(params.in_stock_only));
   const qs = query.toString();
   return apiFetch<ProductPage>(`/products${qs ? `?${qs}` : ""}`);
 }

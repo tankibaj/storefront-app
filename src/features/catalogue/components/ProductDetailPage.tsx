@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
-import { NotFound } from "../../../components/NotFound";
 import { ApiError } from "../../../api/client";
+import { NotFound } from "../../../components/NotFound";
 import { useProduct } from "../hooks/useProduct";
 import { VariantList } from "./VariantList";
 
@@ -53,9 +53,7 @@ export function ProductDetailPage() {
         <div style={placeholderStyle} aria-label="Product image placeholder" />
       )}
 
-      {product.description && (
-        <p style={{ marginBottom: "1.5rem" }}>{product.description}</p>
-      )}
+      {product.description && <p style={{ marginBottom: "1.5rem" }}>{product.description}</p>}
 
       <h2>Variants</h2>
       <VariantList skus={product.skus} />
