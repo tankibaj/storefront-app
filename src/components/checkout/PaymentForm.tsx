@@ -2,6 +2,7 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState } from "react";
 import { useCheckoutStore } from "../../stores/checkout-store";
 import type { ValidationErrorDetail } from "../../types/api";
+import { PaymentError } from "./PaymentError";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -33,12 +34,14 @@ interface PaymentFormProps {
   onPlaceOrder: (paymentMethodId: string) => void;
   isSubmitting?: boolean;
   serverErrors?: ValidationErrorDetail[];
+  paymentError?: string | null;
 }
 
 export function PaymentForm({
   onPlaceOrder,
   isSubmitting = false,
   serverErrors = [],
+  paymentError = null,
 }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
@@ -144,6 +147,8 @@ export function PaymentForm({
           </p>
         )}
       </div>
+
+      {paymentError && <PaymentError message={paymentError} />}
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
         <button

@@ -2,8 +2,13 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { CheckoutStepper } from "../components/checkout/CheckoutStepper";
 import { PaymentForm } from "../components/checkout/PaymentForm";
+import { SessionExpiredError } from "../components/checkout/SessionExpiredError";
 import { ShippingAddressForm } from "../components/checkout/ShippingAddressForm";
 import { ShippingMethodSelector } from "../components/checkout/ShippingMethodSelector";
+import {
+  type ResolvedConflict,
+  StockConflictError,
+} from "../components/checkout/StockConflictError";
 import { usePlaceOrder } from "../hooks/usePlaceOrder";
 import { StripeProvider } from "../providers/StripeProvider";
 import { useCartStore } from "../stores/cart-store";
@@ -32,6 +37,9 @@ export function CheckoutPage() {
   const resetCheckout = useCheckoutStore((state) => state.resetCheckout);
 
   const [serverErrors, setServerErrors] = useState<ValidationErrorDetail[]>([]);
+  const [stockConflicts, setStockConflicts] = useState<ResolvedConflict[] | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const { mutate: submitOrder, isPending } = usePlaceOrder();
 
@@ -41,6 +49,12 @@ export function CheckoutPage() {
   }
 
   const handlePlaceOrder = (paymentMethodId: string) => {
+    // Clear any previous errors on retry
+    setServerErrors([]);
+    setStockConflicts(null);
+    setPaymentError(null);
+    setSessionExpired(false);
+
     const { email, shippingAddress, selectedShippingMethodId, sessionToken } =
       useCheckoutStore.getState();
 
@@ -72,18 +86,54 @@ export function CheckoutPage() {
             setServerErrors(err.details);
             const step = getEarliestErroredStep(err.details);
             setCurrentStep(step);
+            return;
           }
-          // Other errors (409, 401) handled by WP-006-FE
+
+          if (err.type === "stock_conflict") {
+            // Resolve product names from cart items
+            const resolved: ResolvedConflict[] = err.conflicts.map((conflict) => {
+              const cartItem = cartItems.find((i) => i.sku_id === conflict.sku_id);
+              return {
+                sku_id: conflict.sku_id,
+                requested: conflict.requested,
+                available: conflict.available,
+                product_name: cartItem?.product_name ?? conflict.sku_id,
+                variant_label: cartItem?.variant_label ?? "",
+              };
+            });
+            setStockConflicts(resolved);
+            return;
+          }
+
+          if (err.type === "session_expired") {
+            resetCheckout();
+            setSessionExpired(true);
+            return;
+          }
+
+          // payment_failed or other
+          setPaymentError(err.message);
         },
       }
     );
   };
+
+  // Session expired: show message, then redirect to /cart via component's useEffect
+  if (sessionExpired) {
+    return (
+      <main style={{ maxWidth: "640px", margin: "0 auto", padding: "2rem 1rem" }}>
+        <SessionExpiredError />
+      </main>
+    );
+  }
 
   return (
     <main style={{ maxWidth: "640px", margin: "0 auto", padding: "2rem 1rem" }}>
       <h1 style={{ marginBottom: "1.5rem" }}>Checkout</h1>
 
       <CheckoutStepper currentStep={currentStep} />
+
+      {stockConflicts && <StockConflictError conflicts={stockConflicts} />}
 
       {currentStep === 1 && <ShippingAddressForm serverErrors={serverErrors} />}
       {currentStep === 2 && <ShippingMethodSelector />}
@@ -93,6 +143,7 @@ export function CheckoutPage() {
             onPlaceOrder={handlePlaceOrder}
             isSubmitting={isPending}
             serverErrors={serverErrors}
+            paymentError={paymentError}
           />
         </StripeProvider>
       )}
