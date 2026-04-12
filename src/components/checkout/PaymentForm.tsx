@@ -1,6 +1,7 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState } from "react";
 import { useCheckoutStore } from "../../stores/checkout-store";
+import type { ValidationErrorDetail } from "../../types/api";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -29,11 +30,16 @@ function isValidEmail(email: string): boolean {
 }
 
 interface PaymentFormProps {
-  onPlaceOrder: () => void;
+  onPlaceOrder: (paymentMethodId: string) => void;
   isSubmitting?: boolean;
+  serverErrors?: ValidationErrorDetail[];
 }
 
-export function PaymentForm({ onPlaceOrder, isSubmitting = false }: PaymentFormProps) {
+export function PaymentForm({
+  onPlaceOrder,
+  isSubmitting = false,
+  serverErrors = [],
+}: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -42,9 +48,6 @@ export function PaymentForm({ onPlaceOrder, isSubmitting = false }: PaymentFormP
   const selectedShippingMethodId = useCheckoutStore((state) => state.selectedShippingMethodId);
   const shippingAddress = useCheckoutStore((state) => state.shippingAddress);
   const setCurrentStep = useCheckoutStore((state) => state.setCurrentStep);
-  const setStripePaymentMethodToken = useCheckoutStore(
-    (state) => state.setStripePaymentMethodToken
-  );
 
   const [cardComplete, setCardComplete] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
@@ -60,7 +63,7 @@ export function PaymentForm({ onPlaceOrder, isSubmitting = false }: PaymentFormP
   const allComplete = addressValid && !!selectedShippingMethodId && cardComplete && emailValid;
 
   const handlePlaceOrder = async () => {
-    if (!allComplete || !stripe || !elements) return;
+    if (!allComplete || !stripe || !elements || isSubmitting) return;
 
     const cardElement = elements.getElement(CardElement);
     if (!cardElement) return;
@@ -76,13 +79,16 @@ export function PaymentForm({ onPlaceOrder, isSubmitting = false }: PaymentFormP
     }
 
     if (paymentMethod?.id) {
-      setStripePaymentMethodToken(paymentMethod.id);
+      onPlaceOrder(paymentMethod.id);
     }
-
-    onPlaceOrder();
   };
 
-  const emailError = emailTouched && !emailValid ? "A valid email address is required" : undefined;
+  // Server-side error for email field
+  const serverEmailError = serverErrors.find((e) => e.field === "email")?.issue;
+
+  const emailError =
+    serverEmailError ??
+    (emailTouched && !emailValid ? "A valid email address is required" : undefined);
 
   return (
     <div>

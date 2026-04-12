@@ -1,4 +1,10 @@
-import type { ErrorResponse, GuestSession, ShippingMethod } from "../types/api";
+import type {
+  ErrorResponse,
+  GuestOrder,
+  GuestSession,
+  PlaceGuestOrderRequest,
+  ShippingMethod,
+} from "../types/api";
 
 const ORDER_BASE_URL =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_ORDER_API_URL) ||
@@ -37,11 +43,18 @@ async function orderFetch<T>(
   const response = await fetch(url, { ...init, headers });
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => ({
+    // Preserve the raw body for callers that need to inspect error details (e.g. 422, 409, 401)
+    const body = await response.json().catch(() => ({
       code: "UNKNOWN",
       message: response.statusText,
-    }))) as ErrorResponse;
-    throw new OrderApiError(response.status, body.code, body.message);
+    }));
+    const err = new OrderApiError(
+      response.status,
+      (body as ErrorResponse).code,
+      (body as ErrorResponse).message
+    );
+    (err as OrderApiError & { body: unknown }).body = body;
+    throw err;
   }
 
   return response.json() as Promise<T>;
@@ -53,4 +66,14 @@ export function createGuestSession(): Promise<GuestSession> {
 
 export function fetchShippingMethods(sessionToken: string): Promise<ShippingMethod[]> {
   return orderFetch<ShippingMethod[]>("/checkout/shipping-methods", sessionToken);
+}
+
+export function placeGuestOrder(
+  request: PlaceGuestOrderRequest,
+  sessionToken: string
+): Promise<GuestOrder> {
+  return orderFetch<GuestOrder>("/checkout/guest/orders", sessionToken, {
+    method: "POST",
+    body: JSON.stringify(request),
+  });
 }

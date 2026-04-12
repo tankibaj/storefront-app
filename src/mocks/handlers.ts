@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import type { GuestSession, Product, ProductPage, ShippingMethod } from "../types/api";
+import type { GuestOrder, GuestSession, Product, ProductPage, ShippingMethod } from "../types/api";
 
 // ─── Inventory service handlers ───────────────────────────────────────────────
 
@@ -45,6 +45,24 @@ const mockShippingMethods: ShippingMethod[] = [
   },
 ];
 
+const mockConfirmedOrder: GuestOrder = {
+  id: "order-uuid",
+  reference: "ORD-20260411-A3K9",
+  status: "confirmed",
+  lines: [
+    {
+      sku_id: "sku-1",
+      product_name: "Classic T-Shirt",
+      variant_label: "Small",
+      quantity: 2,
+      unit_price: 2999,
+      subtotal: 5998,
+    },
+  ],
+  total: 7497,
+  created_at: "2026-04-11T10:00:00Z",
+};
+
 export const checkoutHandlers = [
   http.post("*/checkout/guest/sessions", () => {
     return HttpResponse.json(mockGuestSession, { status: 201 });
@@ -52,6 +70,11 @@ export const checkoutHandlers = [
 
   http.get("*/checkout/shipping-methods", () => {
     return HttpResponse.json(mockShippingMethods);
+  }),
+
+  // Default: successful order placement (201)
+  http.post("*/checkout/guest/orders", () => {
+    return HttpResponse.json(mockConfirmedOrder, { status: 201 });
   }),
 ];
 

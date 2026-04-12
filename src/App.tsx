@@ -5,6 +5,7 @@ import { ProductDetailPage } from "./features/catalogue/components/ProductDetail
 import { ProductListPage } from "./features/catalogue/components/ProductListPage";
 import { CartPage } from "./pages/CartPage";
 import { CheckoutPage } from "./pages/CheckoutPage";
+import { OrderConfirmationPage } from "./pages/OrderConfirmationPage";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/checkout/confirmation" element={<OrderConfirmationPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

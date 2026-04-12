@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ShippingAddress } from "../../stores/checkout-store";
 import { useCheckoutStore } from "../../stores/checkout-store";
+import type { ValidationErrorDetail } from "../../types/api";
 
 const COUNTRY_OPTIONS = [
   { code: "US", name: "United States" },
@@ -65,13 +66,23 @@ const labelStyle: React.CSSProperties = {
   marginBottom: "4px",
 };
 
-export function ShippingAddressForm() {
+interface ShippingAddressFormProps {
+  serverErrors?: ValidationErrorDetail[];
+}
+
+export function ShippingAddressForm({ serverErrors = [] }: ShippingAddressFormProps) {
   const shippingAddress = useCheckoutStore((state) => state.shippingAddress);
   const setShippingAddress = useCheckoutStore((state) => state.setShippingAddress);
   const setCurrentStep = useCheckoutStore((state) => state.setCurrentStep);
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Partial<Record<keyof ShippingAddress, boolean>>>({});
+
+  // Look up a server-side error for a given address sub-field (e.g. "postal_code")
+  const serverError = (field: keyof ShippingAddress): string | undefined => {
+    const entry = serverErrors.find((e) => e.field === `shipping_address.${field}`);
+    return entry?.issue;
+  };
 
   const handleChange = (field: keyof ShippingAddress, value: string) => {
     setShippingAddress({ [field]: value });
@@ -101,7 +112,8 @@ export function ShippingAddressForm() {
     }
   };
 
-  const fieldError = (field: keyof ShippingAddress) => (touched[field] ? errors[field] : undefined);
+  const fieldError = (field: keyof ShippingAddress): string | undefined =>
+    serverError(field) ?? (touched[field] ? errors[field] : undefined);
 
   return (
     <div>
