@@ -168,10 +168,9 @@ describe("TS-001-010", () => {
     expect(screen.getByText("Small")).toBeInTheDocument();
     expect(screen.getByText("Medium")).toBeInTheDocument();
 
-    // Quantities
-    const qtyCells = screen.getAllByText("2");
-    expect(qtyCells.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("1")).toBeInTheDocument();
+    // Quantities shown in input controls
+    expect(screen.getByDisplayValue("2")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("1")).toBeInTheDocument();
 
     // Unit prices
     expect(screen.getAllByText("$29.99").length).toBeGreaterThanOrEqual(1);
