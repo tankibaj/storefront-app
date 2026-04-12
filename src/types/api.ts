@@ -36,3 +36,29 @@ export interface ErrorResponse {
   code: string;
   message: string;
 }
+
+// ─── Checkout / Order Service ─────────────────────────────────────────────────
+
+/**
+ * Guest checkout session returned by POST /checkout/guest/sessions.
+ * Derived from contracts/api/order-service.openapi.yaml
+ */
+export interface GuestSession {
+  id: string;
+  token: string;
+  expires_at: string;
+}
+
+/**
+ * Shipping method returned by GET /checkout/shipping-methods.
+ * Derived from contracts/api/order-service.openapi.yaml
+ */
+export interface ShippingMethod {
+  id: string;
+  name: string;
+  description: string;
+  /** Cost in minor currency units (e.g. cents). */
+  cost_minor: number;
+  estimated_days_min: number;
+  estimated_days_max: number;
+}

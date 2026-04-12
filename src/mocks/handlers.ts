@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
-import type { Product, ProductPage } from "../types/api";
+import type { GuestSession, Product, ProductPage, ShippingMethod } from "../types/api";
 
-const TEST_TENANT_ID = "00000000-0000-0000-0000-000000000001";
+// ─── Inventory service handlers ───────────────────────────────────────────────
 
 const mockProducts: Product[] = [
   {
@@ -18,7 +18,46 @@ const mockProducts: Product[] = [
   },
 ];
 
+// ─── Order service / checkout handlers ───────────────────────────────────────
+
+const mockGuestSession: GuestSession = {
+  id: "session-uuid-001",
+  token: "session-token-abc",
+  expires_at: "2026-04-12T23:59:59Z",
+};
+
+const mockShippingMethods: ShippingMethod[] = [
+  {
+    id: "sm-1",
+    name: "Standard Shipping",
+    description: "3-5 business days",
+    cost_minor: 599,
+    estimated_days_min: 3,
+    estimated_days_max: 5,
+  },
+  {
+    id: "sm-2",
+    name: "Express Shipping",
+    description: "1-2 business days",
+    cost_minor: 1499,
+    estimated_days_min: 1,
+    estimated_days_max: 2,
+  },
+];
+
+export const checkoutHandlers = [
+  http.post("*/checkout/guest/sessions", () => {
+    return HttpResponse.json(mockGuestSession, { status: 201 });
+  }),
+
+  http.get("*/checkout/shipping-methods", () => {
+    return HttpResponse.json(mockShippingMethods);
+  }),
+];
+
 export const handlers = [
+  ...checkoutHandlers,
+
   http.get("*/products/:productId", ({ request, params }) => {
     const tenantId = request.headers.get("X-Tenant-ID");
     if (!tenantId) {
@@ -63,6 +102,3 @@ export const handlers = [
     return HttpResponse.json(result);
   }),
 ];
-
-// Suppress unused variable warning for TEST_TENANT_ID
-void TEST_TENANT_ID;

@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CartItemRow } from "../components/CartItemRow";
 import { CartTotal } from "../components/CartTotal";
 import { EmptyCart } from "../components/EmptyCart";
+import { useCreateGuestSession } from "../hooks/useCreateGuestSession";
 import { useCartStore } from "../stores/cart-store";
 
 export function CartPage() {
   const items = useCartStore((state) => state.items);
+  const navigate = useNavigate();
+  const createSession = useCreateGuestSession();
 
   if (items.length === 0) {
     return (
@@ -40,20 +43,33 @@ export function CartPage() {
 
       <CartTotal />
 
+      {createSession.isError && (
+        <p role="alert" style={{ color: "#dc2626", textAlign: "right", marginTop: "0.5rem" }}>
+          Unable to start checkout. Please try again.
+        </p>
+      )}
+
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
-        <Link
-          to="/checkout"
+        <button
+          type="button"
+          disabled={createSession.isPending}
+          onClick={() => {
+            createSession.mutate(undefined, {
+              onSuccess: () => navigate("/checkout"),
+            });
+          }}
           style={{
             padding: "0.75rem 2rem",
-            background: "#2d7a2d",
+            background: createSession.isPending ? "#9ca3af" : "#2d7a2d",
             color: "#fff",
+            border: "none",
             borderRadius: "4px",
-            textDecoration: "none",
             fontWeight: "bold",
+            cursor: createSession.isPending ? "not-allowed" : "pointer",
           }}
         >
-          Checkout
-        </Link>
+          {createSession.isPending ? "Starting checkout…" : "Checkout"}
+        </button>
       </div>
     </main>
   );
