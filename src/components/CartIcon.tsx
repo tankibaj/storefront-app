@@ -8,7 +8,13 @@ export function CartIcon() {
     <Link
       to="/cart"
       aria-label={`Cart (${totalItems} items)`}
-      style={{ position: "relative", display: "inline-flex", alignItems: "center", textDecoration: "none", color: "inherit" }}
+      style={{
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+        textDecoration: "none",
+        color: "inherit",
+      }}
     >
       <span role="img" aria-hidden="true" style={{ fontSize: "1.5rem" }}>
         🛒

@@ -19,7 +19,15 @@ export function Layout({ children }: LayoutProps) {
           background: "#fff",
         }}
       >
-        <Link to="/products" style={{ textDecoration: "none", color: "inherit", fontWeight: "bold", fontSize: "1.25rem" }}>
+        <Link
+          to="/products"
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+            fontWeight: "bold",
+            fontSize: "1.25rem",
+          }}
+        >
           Storefront
         </Link>
         <CartIcon />
