@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface CartItem {
   sku_id: string;
@@ -19,45 +20,58 @@ interface CartStore {
   totalPrice: () => number;
 }
 
-export const useCartStore = create<CartStore>()((set, get) => ({
-  items: [],
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
 
-  addItem: (item) => {
-    set((state) => {
-      const existing = state.items.find((i) => i.sku_id === item.sku_id);
-      if (existing) {
-        return {
-          items: state.items.map((i) =>
-            i.sku_id === item.sku_id ? { ...i, quantity: i.quantity + 1 } : i
-          ),
-        };
-      }
-      return { items: [...state.items, { ...item, quantity: 1 }] };
-    });
-  },
+      addItem: (item) => {
+        set((state) => {
+          const existing = state.items.find((i) => i.sku_id === item.sku_id);
+          if (existing) {
+            return {
+              items: state.items.map((i) =>
+                i.sku_id === item.sku_id ? { ...i, quantity: i.quantity + 1 } : i
+              ),
+            };
+          }
+          return { items: [...state.items, { ...item, quantity: 1 }] };
+        });
+      },
 
-  removeItem: (skuId) => {
-    set((state) => ({
-      items: state.items.filter((i) => i.sku_id !== skuId),
-    }));
-  },
+      removeItem: (skuId) => {
+        set((state) => ({
+          items: state.items.filter((i) => i.sku_id !== skuId),
+        }));
+      },
 
-  updateQuantity: (skuId, quantity) => {
-    const clamped = quantity < 1 ? 1 : quantity;
-    set((state) => ({
-      items: state.items.map((i) => (i.sku_id === skuId ? { ...i, quantity: clamped } : i)),
-    }));
-  },
+      updateQuantity: (skuId, quantity) => {
+        const clamped = quantity < 1 ? 1 : quantity;
+        set((state) => ({
+          items: state.items.map((i) => (i.sku_id === skuId ? { ...i, quantity: clamped } : i)),
+        }));
+      },
 
-  clearCart: () => {
-    set({ items: [] });
-  },
+      clearCart: () => {
+        set({ items: [] });
+      },
 
-  totalItems: () => {
-    return get().items.reduce((sum, item) => sum + item.quantity, 0);
-  },
+      totalItems: () => {
+        return get().items.reduce((sum, item) => sum + item.quantity, 0);
+      },
 
-  totalPrice: () => {
-    return get().items.reduce((sum, item) => sum + item.price_minor * item.quantity, 0);
-  },
-}));
+      totalPrice: () => {
+        return get().items.reduce((sum, item) => sum + item.price_minor * item.quantity, 0);
+      },
+    }),
+    {
+      name: "storefront-cart",
+      version: 1,
+      onRehydrateStorage: () => (_state, error) => {
+        if (error) {
+          console.warn("Failed to rehydrate cart:", error);
+        }
+      },
+    }
+  )
+);
