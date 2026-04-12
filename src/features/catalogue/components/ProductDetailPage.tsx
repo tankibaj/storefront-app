@@ -56,7 +56,7 @@ export function ProductDetailPage() {
       {product.description && <p style={{ marginBottom: "1.5rem" }}>{product.description}</p>}
 
       <h2>Variants</h2>
-      <VariantList skus={product.skus} />
+      <VariantList skus={product.skus} productName={product.name} imageUrl={product.image_url} />
     </main>
   );
 }
