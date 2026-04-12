@@ -23,14 +23,12 @@ function validateAddress(address: ShippingAddress): ValidationErrors {
   else if (address.line1.length > 100)
     errors.line1 = "Address Line 1 must be 100 characters or fewer";
 
-  if (address.line2.length > 100)
-    errors.line2 = "Address Line 2 must be 100 characters or fewer";
+  if (address.line2.length > 100) errors.line2 = "Address Line 2 must be 100 characters or fewer";
 
   if (!address.city.trim()) errors.city = "City is required";
   else if (address.city.length > 100) errors.city = "City must be 100 characters or fewer";
 
-  if (address.state.length > 100)
-    errors.state = "State / Province must be 100 characters or fewer";
+  if (address.state.length > 100) errors.state = "State / Province must be 100 characters or fewer";
 
   if (!address.postal_code.trim()) errors.postal_code = "Postal Code is required";
   else if (address.postal_code.length > 20)
@@ -103,8 +101,7 @@ export function ShippingAddressForm() {
     }
   };
 
-  const fieldError = (field: keyof ShippingAddress) =>
-    touched[field] ? errors[field] : undefined;
+  const fieldError = (field: keyof ShippingAddress) => (touched[field] ? errors[field] : undefined);
 
   return (
     <div>

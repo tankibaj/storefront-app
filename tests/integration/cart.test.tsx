@@ -28,13 +28,16 @@ function renderProductDetail(productId: string, queryClient?: QueryClient) {
 }
 
 function renderCartPage() {
+  const qc = createQueryClient();
   return render(
-    <MemoryRouter initialEntries={["/cart"]}>
-      <Routes>
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/products" element={<div>Products page</div>} />
-      </Routes>
-    </MemoryRouter>
+    <QueryClientProvider client={qc}>
+      <MemoryRouter initialEntries={["/cart"]}>
+        <Routes>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/products" element={<div>Products page</div>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
 }
 

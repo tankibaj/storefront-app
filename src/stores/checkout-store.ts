@@ -45,8 +45,7 @@ export const useCheckoutStore = create<CheckoutState>()((set) => ({
   email: "",
   stripePaymentMethodToken: null,
 
-  setSessionToken: (token, expiresAt) =>
-    set({ sessionToken: token, sessionExpiresAt: expiresAt }),
+  setSessionToken: (token, expiresAt) => set({ sessionToken: token, sessionExpiresAt: expiresAt }),
 
   setShippingAddress: (address) =>
     set((state) => ({

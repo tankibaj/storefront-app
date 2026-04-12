@@ -1,6 +1,6 @@
+import { useShippingMethods } from "../../hooks/useShippingMethods";
 import { useCheckoutStore } from "../../stores/checkout-store";
 import { formatPrice } from "../../utils/format";
-import { useShippingMethods } from "../../hooks/useShippingMethods";
 
 export function ShippingMethodSelector() {
   const selectedShippingMethodId = useCheckoutStore((state) => state.selectedShippingMethodId);

@@ -114,7 +114,7 @@ export function PaymentForm({ onPlaceOrder, isSubmitting = false }: PaymentFormP
       </div>
 
       <div style={{ marginBottom: "1.5rem" }}>
-        <label style={labelStyle}>Card Details</label>
+        <p style={{ ...labelStyle, margin: 0, marginBottom: "4px" }}>Card Details</p>
         <div
           style={{
             padding: "0.625rem 0.75rem",

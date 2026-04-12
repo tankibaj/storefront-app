@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -6,14 +7,23 @@ import { useCartStore } from "../../src/stores/cart-store";
 
 // ─── Test helpers ─────────────────────────────────────────────────────────────
 
+function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+}
+
 function renderCartPage() {
+  const qc = createQueryClient();
   return render(
-    <MemoryRouter initialEntries={["/cart"]}>
-      <Routes>
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/products" element={<div>Products page</div>} />
-      </Routes>
-    </MemoryRouter>
+    <QueryClientProvider client={qc}>
+      <MemoryRouter initialEntries={["/cart"]}>
+        <Routes>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/products" element={<div>Products page</div>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
 }
 
