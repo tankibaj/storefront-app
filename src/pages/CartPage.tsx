@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { CartItemRow } from "../components/CartItemRow";
 import { CartTotal } from "../components/CartTotal";
+import { EmptyCart } from "../components/EmptyCart";
 import { useCartStore } from "../stores/cart-store";
 
 export function CartPage() {
@@ -10,8 +11,7 @@ export function CartPage() {
     return (
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
         <h1>Your cart</h1>
-        <p>Your cart is empty.</p>
-        <Link to="/products">Browse products</Link>
+        <EmptyCart />
       </main>
     );
   }
@@ -25,9 +25,10 @@ export function CartPage() {
           <tr style={{ borderBottom: "2px solid #ccc", textAlign: "left" }}>
             <th style={{ padding: "0.5rem 0.75rem" }}>Product</th>
             <th style={{ padding: "0.5rem 0.75rem" }}>Variant</th>
-            <th style={{ padding: "0.5rem 0.75rem", textAlign: "center" }}>Qty</th>
+            <th style={{ padding: "0.5rem 0.75rem" }}>Qty</th>
             <th style={{ padding: "0.5rem 0.75rem", textAlign: "right" }}>Unit Price</th>
             <th style={{ padding: "0.5rem 0.75rem", textAlign: "right" }}>Subtotal</th>
+            <th style={{ padding: "0.5rem 0.75rem" }} />
           </tr>
         </thead>
         <tbody>
