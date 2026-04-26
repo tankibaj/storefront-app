@@ -1,0 +1,33 @@
+name: Generate API Specs
+
+on:
+  push:
+    branches: [main]
+    paths: [src/**]
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: node scripts/generate-specs.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          if git diff --cached --quiet; then
+            echo "No spec changes detected"
+          else
+            git commit -m "chore: regenerate API specs [skip ci]"
+            git push
+          fi
